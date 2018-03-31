@@ -1,0 +1,328 @@
+@charset "UTF-8";
+.planing-module{
+    position: relative;
+    width: 260px;
+    height: 360px;
+    border-radius: 2px;
+    background-color: hsl(0, 0%, 100%);
+    box-shadow: 1px 1px 15px hsla(0, 0%, 0%, .1);
+    transform-origin: 100% 0%;
+    animation: show-planning-module 340ms forwards;
+    font-size: 16px;
+    overflow: hidden;
+    &[data-feat="JIHUA"]{
+        .task-list-wrap{
+            padding-bottom: 2.5em;
+            .task-item-wrap{
+                padding-right: 3.5em;
+            }
+            .check-box{
+                border: 2px solid hsl(281, 90%, 50%);
+            }
+        }
+        .add-task-wrap{
+            bottom: 0;
+        }
+    }
+    &[data-feat="HUAKAI"]{
+        .task-list-wrap{
+            padding-bottom: 0;
+            .task-item-wrap{
+                padding-right: .5em;
+            }
+            .check-box{
+                border: 2px solid hsl(231, 92%, 43%);
+                &:before, &:after{
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    height: 2px;
+                    margin-top: -1px;
+                    background-color: hsl(231, 92%, 43%);
+                    content: '';
+                }
+                &:before{
+                    width: 2px;
+                    margin-left: -3px;
+                    transform: rotate(45deg);
+                }
+                &:after{
+                    width: 6px;
+                    margin-left: -2px;
+                    transform: rotate(-45deg);   
+                }
+            }
+        }
+        .add-task-wrap{
+            bottom: -40px;
+        }
+    }
+    &[data-feat="CHENFENG"]{
+        .task-list-wrap{
+            padding-bottom: 0;
+            .task-item-wrap{
+                padding-right: .5em;
+            }
+            .check-box{
+                border: 2px solid hsl(24, 91%, 46%);
+                &:before, &:after{
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 7px;
+                    height: 2px;
+                    margin-top: -1px;
+                    margin-left: -3px;
+                    background-color: hsl(24, 91%, 46%);
+                    content: '';
+                }
+                &:before{
+                    transform: rotate(45deg);
+                }
+                &:after{
+                    transform: rotate(-45deg);   
+                }
+            }
+        }
+        .add-task-wrap{
+            bottom: -40px;
+        }
+    }
+    .navbar-wrap{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+        .tag-btn{
+            position: relative;
+            float: left;
+            height: 45px;
+            line-height: 42px;
+            text-align: center;
+            font-size: 1em;
+            color: #888;
+            overflow: hidden;
+            &:hover{
+                cursor: pointer;
+            }
+            .tag-name{
+                opacity: .8;
+                transition: all .230ms;
+            }
+            &.active{
+                .tag-name{
+                    opacity: 1;
+                }
+            }
+        }
+        &:after{
+            clear: both;
+            display: block;
+            content: '';
+        }
+        #planning_navbar_pointer{
+            position: absolute;
+            bottom: 0;
+            left: 0%;
+            width: 33.33%;
+            height: 2px;
+            border-radius: 10px;
+            transition: all 230ms;
+        }
+    }
+    .task-list-wrap{
+        position: absolute;
+        z-index: 0;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding-top: 3em;
+        transition: all 230ms;
+        .task-list{
+            height: 100%;
+            overflow: auto;
+        }
+        .task-item-wrap{
+            font-size: 1em;
+            padding-left: 2em;
+            position: relative;
+            background-color: #fff;
+            opacity: 0;
+            animation: fade-in-task-item 130ms forwards;
+            cursor: default;
+            user-select: none;
+            -moz-user-select: none;
+            &:hover{
+                background-color: #f9f9f9;
+            }
+            .check-box{
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 13px;
+                height: 13px;
+                border-radius: 3px;
+                margin-top: .8em;
+                margin-left: .6em;
+            }
+            p{
+                margin: 0;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                font-size: .9em;
+                line-height: 2.7;
+            }
+            .date{
+                position: absolute;
+                right: 0;
+                top: 0;
+                font-size: .8em;
+                line-height: 3.2em;
+                padding-right: .8em;
+            }
+        }
+    }
+    .add-task-wrap{
+        position: absolute;
+        z-index: 100;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        font-size: 16px;
+        transition: all 230ms;
+        .add-task-input-wrap{
+            border-top: 1px solid hsl(0, 0%, 93%);
+            padding-right: 2.5em;
+            background-color: hsl(0, 0%, 98%);
+            .add-task-input{
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                outline: none;
+                -webkit-appearance: none;
+                border: none;
+                height: 2.5em;
+                font-size: 1em;
+                color: hsl(0, 0%, 20%);
+                font-family: sans-serif,"微软雅黑",serif;
+                text-indent: 1em;
+                background-color: transparent;
+                &::-webkit-input-placeholder{color:#ababab;}
+                &::-moz-placeholder{color:#ababab;}
+                &:-ms-placeholder{color:#ababab;}
+            }
+            .send-task{
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 2.5em;
+                height: 2.5em;
+                border-top: 1px solid hsl(240, 3%, 94%);
+                &:before{
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    border: 6px solid hsla(0, 0%, 0%, 0);
+                    border-left: 9px solid hsl(0, 0%, 47%);
+                    margin-left: -3px;
+                    margin-top: -5px;
+                }
+                &:hover{
+                    cursor: pointer;
+                    &:before{
+                        animation: jump-send-task-button 200ms;
+                    }
+                }
+            }
+        }
+    }
+    .loading-wrap{
+        opacity: 0;
+        z-index: 9999;
+        position: absolute;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: hsla(0, 0%, 100%, .5);
+        transition: opacity 330ms;
+        &[data-visibility="hidden"]{
+            opacity: 0;
+        }
+        &[data-visibility="visible"]{
+            opacity: 1;
+        }
+        .loading-dot{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            margin-top: -5px;
+            margin-left: -5px;
+            background-color: blueviolet;
+        }
+    }
+}
+@keyframes jump-send-task-button{
+    0%{
+        opacity: 1;
+        transform: translateX(0px);
+    }
+    50%{
+        opacity: 0;
+        transform: translateX(15px);
+    }
+    51%{
+        opacity: 0;
+        transform: translateX(-15px);
+    }
+    100%{
+        opacity: 1;
+        transform: translateX(0px);
+    }
+}
+@keyframes loading-dot{
+    0%{
+        transform: translateY(0px);
+    }
+    20%{
+        transform: translateY(8px);
+    }
+    50%{
+        transform: translateY(-8px);
+    }
+    100%{
+        transform: translateY(0px);
+    }
+}
+@keyframes show-planning-module{
+    0%{
+        opacity: 0;
+        transform: scale(0, 0);
+    }
+    100%{
+        opacity: 1;
+        transform: scale(1, 1);
+    }
+}
+@keyframes fade-in-task-item{
+    0%{
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    100%{
+        opacity: 1;
+        max-height: 3em;
+        transform: translateY(0px);
+    }
+}

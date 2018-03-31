@@ -1,0 +1,36 @@
+{
+  "name": "airglass",
+  "version": "3.0.0",
+  "description": "future-user-interface-datavisualization-charts",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lanserdi/FCharts.git"
+  },
+  "keywords": [
+    "fui",
+    "hud"
+  ],
+  "author": "陈帅华",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lanserdi/FCharts/issues"
+  },
+  "homepage": "https://github.com/lanserdi/FCharts#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "multer": "^1.3.0",
+    "mysql": "^2.15.0",
+    "webpack": "^3.10.0"
+  },
+  "scripts": {
+    "build_less": "./node_modules/.bin/less-watch-compiler src/less dist planning.less",
+    "build_js": "./node_modules/.bin/webpack -w"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "less-watch-compiler": "^1.11.0"
+  }
+}
