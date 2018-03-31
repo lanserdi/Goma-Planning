@@ -7,7 +7,7 @@ module.exports = {
     },
     output: {
         libraryTarget: "umd",
-        library: ["planning"],
+        library: ["airglass"],
         path: __dirname + "/dist",
         filename: "[name].js"
     },
