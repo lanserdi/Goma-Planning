@@ -1,6 +1,6 @@
 {
-  "name": "airglass",
-  "version": "3.0.0",
+  "name": "airglass-planning",
+  "version": "1.0.0",
   "description": "future-user-interface-datavisualization-charts",
   "main": "index.js",
   "repository": {
