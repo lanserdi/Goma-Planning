@@ -76,7 +76,7 @@ api.put('/update_task/:id/:op', (req, res)=>{
             sql = `update task set is_finished = 1 where id = ${id}`;
             break;
         case 'go_jihua':
-            sql = `update task set create_timestamp = '${date}' where id = ${id}`;
+            sql = `update task set create_timestamp = '${date}', finish_timestamp = NULL where id = ${id}`;
             break;
     }
     mysqlQuery(sql, (e, r)=>{
