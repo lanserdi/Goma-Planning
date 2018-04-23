@@ -3,7 +3,7 @@ const MinifyPlugin = require("babel-minify-webpack-plugin");
 
 module.exports = {
     entry: {
-        planning: __dirname + "/index.js"
+        airglass: __dirname + "/index.js"
     },
     output: {
         libraryTarget: "umd",
