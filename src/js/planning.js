@@ -1,7 +1,18 @@
 const utility = require('./utils/utils.js');
+import cssfile from '../less/planning.less';
+
 export class Planning {
     constructor(){
         this.ANIMATION_DURATION__LOADING = 500;
+
+        let style = document.createElement('style');
+        style.setAttribute('rel','stylesheet');
+        style.setAttribute('type','text/css');
+        if ( style.styleSheet )
+            style.styleSheet.cssText = cssfile.toString();
+        else
+            style.innerHTML = cssfile.toString();
+        document.getElementsByTagName('head')[0].appendChild(style);
     }
     runApp(_eleWrap){
         this.stopApp();
@@ -221,11 +232,7 @@ export class Planning {
                 dateStr = `${utility.dealDateNumber(lost.getUTCHours())}:${utility.dealDateNumber(lost.getUTCMinutes())}`;
             }   
         }
-        return `<div data-feat="${q}"><div class="task-item-wrap" data-id="${id}" style="animation-delay: ${ 50 * i}ms">
-                    <div class="check-box" data-type="btn" data-task-id="${id}" data-feat="${q}"></div>
-                    <p class="title">${title}</p>
-                    <span class="date">${dateStr}</span>
-                </div></div>`;
+        return `<div data-feat="${q}"><div class="task-item-wrap" data-id="${id}" style="animation-delay: ${ 50 * i}ms"><div class="check-box" data-type="btn" data-task-id="${id}" data-feat="${q}"></div><p class="title">${title}</p><span class="date">${dateStr}</span></div></div>`;
     }
     // ----------ADDTASK----------START
     createAddTaskComponent(){

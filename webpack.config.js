@@ -1,5 +1,6 @@
-var PROD = process.argv.indexOf("-p") >= 0;
-var webpack = require("webpack");
+const webpack = require("webpack");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MinifyPlugin = require("babel-minify-webpack-plugin");
 
 module.exports = {
     entry: {
@@ -16,19 +17,25 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: "babel-loader"
+            },
+
+            {
+                test: /\.less$/,
+                use: [
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            minimize: true
+                        }
+                    },
+                    {
+                        loader: 'less-loader'
+                    }
+                ]
             }
         ]
     },
     plugins: [
-        // new webpack.optimize.UglifyJsPlugin({
-        //     beautify: false,
-        //     comments: false,
-        //     compress: {
-        //         warnings: false,
-        //         drop_console: true,
-        //         collapse_vars: true,
-        //         reduce_vars: true,
-        //     }
-        // })
+        new MinifyPlugin()
     ]
 };
