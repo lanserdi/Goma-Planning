@@ -24,6 +24,7 @@
     "webpack": "^3.10.0"
   },
   "scripts": {
+		"start": "node server.js",
     "build_less": "./node_modules/.bin/less-watch-compiler src/less dist planning.less",
     "build_js": "./node_modules/.bin/webpack -w"
   },
