@@ -1,16 +1,13 @@
 {
-  "name": "airglass-planning",
+  "name": "goma-planning",
   "version": "1.0.3",
-  "description": "future-user-interface-datavisualization-charts",
+  "description": "",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lanserdi/Planning-Airglass.git"
   },
-  "keywords": [
-    "fui",
-    "hud"
-  ],
+  "keywords": [],
   "author": "陈帅华",
   "license": "MIT",
   "bugs": {
@@ -18,24 +15,14 @@
   },
   "homepage": "https://github.com/lanserdi/Planning-Airglass#readme",
   "dependencies": {
-    "express": "^4.16.2",
-    "multer": "^1.3.0",
-    "mysql": "^2.15.0",
-    "webpack": "^3.10.0"
+    "@babel/runtime": "^7.5.5"
   },
-  "scripts": {
-    "start": "node server.js",
-    "build_less": "./node_modules/.bin/less-watch-compiler src/less dist planning.less",
-    "build_js": "./node_modules/.bin/webpack -w"
-  },
+  "scripts": {},
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.4",
-    "babel-minify-webpack-plugin": "^0.3.1",
-    "babel-preset-env": "^1.6.1",
-    "css-loader": "^0.28.11",
-    "less-loader": "^4.1.0",
-    "less-watch-compiler": "^1.11.0",
-    "style-loader": "^0.21.0"
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0"
   }
 }

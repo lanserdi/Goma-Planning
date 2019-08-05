@@ -1,1 +1,1 @@
-module.exports = require('./src/js/planning');
+module.exports = require('./src/js/main.js');
