@@ -15,7 +15,10 @@
   },
   "homepage": "https://github.com/lanserdi/Planning-Airglass#readme",
   "dependencies": {},
-  "scripts": {},
+  "scripts": {
+    "css": "sass src/css/main.scss site/public/css/main.css --style compressed --sourcemap=inline",
+    "js": "rollup -c"
+  },
   "devDependencies": {
     "rollup-plugin-json": "^4.0.0"
   }
