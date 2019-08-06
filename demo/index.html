@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Planning</title>
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+  <body>
+    <div id="elePlanning" style="margin: 0 auto;"></div>
+  </body>
+  <script type="text/javascript" src="js/main.js"></script>
+  <script>
+    var planningInstance = new goma.Planning({
+      eleWrap: document.querySelector('#elePlanning'),
+      cardsProp: [
+        {
+          title: '待完成'
+        },
+        {
+          title: '已完成'
+        },
+        {
+          title: '回收站'
+        }
+      ]
+    });
+  </script>
+</html>

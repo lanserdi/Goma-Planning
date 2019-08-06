@@ -1,127 +1,90 @@
 import { dealDateNumber } from'./utils.js';
 
 export default class Planning {
-  constructor(){
-    this.ANIMATION_DURATION__LOADING = 500;
+  constructor(opts){
+    // 判断opts.elewrap是否为div元素
+    if(Object.prototype.toString.call(opts.eleWrap) !== '[object HTMLDivElement]')
+      throw new Error('确保eleWrap参数类型为HTMLDivElement！');
 
-    let style = document.createElement('style');
-    style.setAttribute('rel','stylesheet');
-    style.setAttribute('type','text/css');
-    if ( style.styleSheet )
-      style.styleSheet.cssText = cssfile.toString();
-    else
-      style.innerHTML = cssfile.toString();
-    document.getElementsByTagName('head')[0].appendChild(style);
-  }
-  runApp(_eleWrap){
-    this.stopApp();
-    this.eleWrap = _eleWrap;
-    this.eleWrap.classList.add('planing-module');
-    this.createNavBar();
-    this.createTaskListWrap();
-    this.createAddTaskComponent();
+    // 上方判断为真就给实例添加eleWrap属性
+    this.eleWrap = opts.eleWrap;
 
+    //  判断opts.cardsProp是否为数组 且至少包含一个card对象
+    if(Object.prototype.toString.call(opts.cardsProp) !== '[object Array]' || opts.cardsProp.length < 1)
+      throw new Error('确保cards参数为至少包含一个card对象的数组！');
+
+    // 上方判断为真就给实例添加cardsProp属性
+    this.cardsProp = opts.cardsProp;
+
+    // 通过上方校验后 初始化
+    this._init();
   }
-  stopApp(){
-    if(!this.eleWrap) return;
-    this.eleWrap.innerHTML = '';
-    this.eleWrap.classList.remove('planing-module');
-    this.eleWrap = null,
-    this.eleTaskListWrap = null,
-    this.eleTaskList = null,
-    this.eleLoading = null,
-    this.eleAddTaskWrap = null,
-    this.addTaskInputWrap = null,
-    this.eleTaskInput = null,
-    this.eleSendTask = null,
-    this.eleNavBarWrap = null;
+  _init(){
+    // 为容器元素添加类名
+    this.eleWrap.classList.add('goma-planing-scope');
+
+    // 默认第一个cardProp对象未激活状态
+    this.activeCardPropIndex = 0;
+
+    // 渲染顶部导航
+    this._renderNavBar();
+    // this.createTaskListWrap();
+    // this.createAddTaskComponent();
   }
   // ----------NavBar-----------------
-  createNavBar(){
-    let that = this;
+  _renderNavBar(){
 
-    this.eleNavBarWrap = document.createElement('div');
-    this.eleNavBarWrap.classList.add('navbar-wrap');
-    this.eleWrap.appendChild(this.eleNavBarWrap);
+    // 如果顶部导航容器不存在
+    if(!this.eleWrap.querySelector('.navbar-wrap')){
+      // 创建顶部导航容器
+      this.eleNavBarWrap = document.createElement('div');
+      this.eleNavBarWrap.classList.add('navbar-wrap');
 
-    this.eleNavBarWrap.addEventListener('mouseover', this.onMouseOverNavbar, false);
-    this.eleNavBarWrap.addEventListener('mouseleave', this.onMouseLeaveNavbar, false);
-    this.eleNavBarWrap.addEventListener('click', function(e){that.onMouseClickNavbar(this, e)}, false);
+      // 追加到外部容器中
+      this.eleWrap.appendChild(this.eleNavBarWrap);
 
-    let data = [
-      {
-        isActive: true,
-        name: '计划',
-        color: 'hsl(281, 90%, 50%)',
-        feat: 'JIHUA'
-      },
-      {
-        isActive: false,
-        name: '花开',
-        color: 'hsl(231, 92%, 43%)',
-        feat: 'HUAKAI'
-      },
-      {
-        isActive: false,
-        name: '尘封',
-        color: 'hsl(24, 91%, 46%)',
-        feat: 'CHENFENG'
-      }
-    ]
-    let str = ``,
-      width = (100/data.length).toFixed(2),
-      activeColor,
-      activeP;
-    for(let i=0; i<data.length; i++){
-      let tag = data[i];
-      if(tag.isActive){
-        activeColor = tag.color;
-        activeP = width * i;
-        this.eleWrap.dataset.feat = tag.feat;
-        this.renderTasksByTag(tag.feat);
-      }
-      str += `<div data-type="btn" data-feat="${tag.feat}" data-p="${width*i}%" data-c="${tag.color}" data-state="${tag.isActive ? 'on' : 'off'}" class="tag-btn${tag.isActive ? ' active' : ''}" style="width:${width}%;"><span class="tag-name" style="color:${tag.color};">${tag.name}</span></div>`;
+      // 添加点击事件监听器
+      this.eleNavBarWrap.addEventListener('click', this.onMouseClickNavbar.bind(this), false);
     }
-    str += `<div id="planning_navbar_pointer" style="background-color:${activeColor}; left:${activeP}%;"></div>`;
-    this.eleNavBarWrap.innerHTML = str;
-  }
-  onMouseOverNavbar(e){
-    let target = e.target,
-      type = target.dataset.type;
-    if(!type || type != 'btn') return;
-    let p = target.dataset.p,
-      c = target.dataset.c,
-      ele = this;
-    ele.querySelector('#planning_navbar_pointer').style.left = p;
-    ele.querySelector('#planning_navbar_pointer').style.backgroundColor = c;
-  }
-  onMouseLeaveNavbar(e){
-    let ele = this,
-      activeNavbarItem = ele.querySelector('.active'),
-      p = activeNavbarItem.dataset.p,
-      c = activeNavbarItem.dataset.c;
 
-    ele.querySelector('#planning_navbar_pointer').style.left = p;
-    ele.querySelector('#planning_navbar_pointer').style.backgroundColor = c;
+    // 存储覆盖导航容器全部内容的html片段
+    let _html = '';
+
+    // 存储cardsProp数组长度
+    let _l = this.cardsProp.length;
+
+    // 存储计算后的单个导航卡的百分比宽度
+    let _singleNavWidth = (100 / _l).toFixed(2);
+
+    for(let _i = 0; _i < _l; _i++){
+      // 存储当前遍历到的cardProp
+      let cardProp = this.cardsProp[_i];
+      // 存储当前遍历到的cardProp的距左百分比
+      let _lp = _singleNavWidth * _i;
+
+      // 追加导航卡
+      _html += `<div data-type="btn" data-i="${_i}" class="tag-btn${this.activeCardPropIndex == _i ? ' active' : ''}" style="width:${_singleNavWidth}%;"><span class="tag-name">${cardProp.title}</span></div>`;
+    }
+
+    // 存储当前激活状态的导航卡的指示器距离导航容器左侧百分比距离 _active_left_position缩写
+    let _alp = this.activeCardPropIndex * _singleNavWidth;
+    // 在当前已激活的导航卡下方追加指示器样式
+    _html += `<div class="navbar-pointer" style="left:${_alp}%;"></div>`;
+
+    // 全部覆盖顶部导航容器中的内容
+    this.eleNavBarWrap.innerHTML = _html;
   }
-  onMouseClickNavbar(ele, e){
+  onMouseClickNavbar(e){
     let target = e.target;
-    while(target !== ele){
+
+    while(target != this.eleNavBarWrap){
+      // 当前元素类型
       let type = target.dataset.type;
+      // 如果是点击交互的按钮
       if(type == 'btn'){
-        let activeNavbarItem = ele.querySelector('.active'),
-          feat = target.dataset.feat;
-
-        activeNavbarItem.dataset.state = 'off'
-        activeNavbarItem.classList.remove('active');
-
-        target.dataset.state = 'on';
-        target.classList.add('active');
-
-        ele.parentNode.dataset.feat = feat;
-
-        this.renderTasksByTag(feat);
-
+        this.activeCardPropIndex = +target.dataset.i
+        this._renderNavBar()
+        break;
       }
       target = target.parentNode;
     }
@@ -173,44 +136,10 @@ export default class Planning {
       id = target.dataset.taskId;
     if(type && type == 'btn' && feat && id){
       switch(feat){
-        case 'JIHUA':
-          this.taskGoHUAKAI(id, target);
-          break;
-        case 'HUAKAI':
-          break;
-        case 'CHENFENG':
-          this.taskGoJIHUA(id, target);
+        default:
           break;
       }
     }
-  }
-  taskGoHUAKAI(id, ele){
-    let eleWrap = ele.parentNode.parentNode,
-      client = new XMLHttpRequest();
-    client.responseType = 'json';
-    client.onreadystatechange = ()=>{
-      if(client.status == 200 && client.readyState == 4){
-        let res = client.response;
-        if(!res.flag) return;
-        eleWrap.parentNode.removeChild(eleWrap);
-      }
-    }
-    client.open('PUT', `/api/update_task/${id}/go_huakai`, true);
-    client.send();
-  }
-  taskGoJIHUA(id, ele){
-    let eleWrap = ele.parentNode.parentNode,
-      client = new XMLHttpRequest();
-    client.responseType = 'json';
-    client.onreadystatechange = ()=>{
-      if(client.status == 200 && client.readyState == 4){
-        let res = client.response;
-        if(!res.flag) return;
-        eleWrap.parentNode.removeChild(eleWrap);
-      }
-    }
-    client.open('PUT', `/api/update_task/${id}/go_jihua`, true);
-    client.send();
   }
   appendNewTaskToTaskList(id,title,timestamp){
     let _eleTemp = document.createElement('div');
@@ -254,42 +183,6 @@ export default class Planning {
     this.addTaskInputWrap.appendChild(this.eleSendTask);
     this.eleSendTask.addEventListener('click', (e) => { this.onClickSendTask(e)}, false);
   }
-  onClickSendTask(e){
-    this.showLoading();
-    let _o = this.eleTaskInput.value.replace(/^\s+|\s$/g, '');
-    this.eleTaskInput.value = '';
-    if (!_o || _o.length < 4 || _o.length >= 24) {
-      this.eleTaskInput.focus();
-      this.destroyLoading();
-      return;
-    }
-    this.sendTask(_o);
-  }
-  sendTask(_taskContent) {
-    let _xhr = new XMLHttpRequest(),
-      _url = '/api/add_task/',
-      _fd = new FormData();
-    _xhr.responseType = 'json';
-    _xhr.onreadystatechange = ()=>{
-      if (_xhr.status == 200 && _xhr.readyState == 4){
-        let res = _xhr.response;
-        if(res.flag){
-          let id = res.result.title,
-            title = res.result.title,
-            create_timestamp = res.result.create_timestamp;
-          this.appendNewTaskToTaskList(id, title, create_timestamp);
-        }
-        res = null;
-        _xhr.onreadystatechange = null;
-        _xhr = null;
-        this.destroyLoading();
-      }
-    }
-    _fd.append('task_title', _taskContent);
-    _xhr.open('POST', _url, true);
-    _xhr.send(_fd);
-    _fd = null;
-  }
   // ----------LOADING----------START
   createLoadingComponent(){
     let eleWrap = document.createElement('div'),
@@ -306,7 +199,7 @@ export default class Planning {
     return eleWrap;
   }
   showLoading() {
-    let _duration = this.ANIMATION_DURATION__LOADING;
+    let _duration = this.LOAD_TIME;
     this.eleLoading = this.createLoadingComponent();
     this.eleLoading.style.transitionDelay = `${_duration}ms`;
     this.eleLoading.dataset.visibility = 'visible';
@@ -319,7 +212,7 @@ export default class Planning {
       this.eleLoading = null;
       clearTimeout(timer);
       timer = null;
-    }, this.ANIMATION_DURATION__LOADING*2);
+    }, this.LOAD_TIME*2);
     this.eleLoading.dataset.visibility = 'hidden';
   }
 }

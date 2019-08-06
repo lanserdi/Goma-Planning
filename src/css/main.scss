@@ -1,4 +1,4 @@
-.planing-module{
+.goma-planing-scope{
   position: relative;
   width: 260px;
   height: 360px;
@@ -93,6 +93,7 @@
     left: 0;
     width: 100%;
     z-index: 1;
+
     .tag-btn{
       position: relative;
       float: left;
@@ -100,19 +101,16 @@
       line-height: 42px;
       text-align: center;
       font-size: 1em;
-      color: #888;
       overflow: hidden;
-      &:hover{
-        cursor: pointer;
-      }
+      cursor: default;
+
       .tag-name{
-        opacity: .8;
+        color: #999;
         transition: all .230ms;
       }
+
       &.active{
-        .tag-name{
-          opacity: 1;
-        }
+        .tag-name{color: #333;}
       }
     }
     &:after{
@@ -120,12 +118,13 @@
       display: block;
       content: '';
     }
-    #planning_navbar_pointer{
+    .navbar-pointer{
       position: absolute;
       bottom: 0;
       left: 0%;
       width: 33.33%;
       height: 2px;
+      background-color: #333;
       border-radius: 10px;
       transition: all 230ms;
     }
