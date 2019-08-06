@@ -14,15 +14,9 @@
     "url": "https://github.com/lanserdi/Planning-Airglass/issues"
   },
   "homepage": "https://github.com/lanserdi/Planning-Airglass#readme",
-  "dependencies": {
-    "@babel/runtime": "^7.5.5"
-  },
+  "dependencies": {},
   "scripts": {},
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/plugin-transform-runtime": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "gulp": "^4.0.2",
-    "gulp-babel": "^8.0.0"
+    "rollup-plugin-json": "^4.0.0"
   }
 }

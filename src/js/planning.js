@@ -1,7 +1,6 @@
-import utility from'./utils.js';
-import cssfile from '../css/main.scss';
+import { dealDateNumber } from'./utils.js';
 
-export class Planning {
+export default class Planning {
   constructor(){
     this.ANIMATION_DURATION__LOADING = 500;
 
@@ -229,7 +228,7 @@ export class Planning {
       if(lostDate){
         dateStr = `·${lostDate}天<`;
       }else{
-        dateStr = `${utility.dealDateNumber(lost.getUTCHours())}:${utility.dealDateNumber(lost.getUTCMinutes())}`;
+        dateStr = `${dealDateNumber(lost.getUTCHours())}:${dealDateNumber(lost.getUTCMinutes())}`;
       }
     }
     return `<div data-feat="${q}"><div class="task-item-wrap" data-id="${id}" style="animation-delay: ${ 50 * i}ms"><div class="check-box" data-type="btn" data-task-id="${id}" data-feat="${q}"></div><p class="title">${title}</p><span class="date">${dateStr}</span></div></div>`;
