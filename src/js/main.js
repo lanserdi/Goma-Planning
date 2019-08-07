@@ -1,3 +1,5 @@
-import Planning from './planning.js';
+import planning from './planning'
 
-export { Planning };
+export default {
+  planning
+}
