@@ -1,5 +1,5 @@
-import planning from './planning'
+import Planning from './planning'
 
 export default {
-  planning
+  Planning
 }
