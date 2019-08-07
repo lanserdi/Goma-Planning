@@ -6,7 +6,7 @@ export default {
   input: "src/js/main.js",
   output: {
     file: "demo/js/main.js",
-    format: "iife",
+    format: "umd",
     name: "goma"
   },
   plugins: [
