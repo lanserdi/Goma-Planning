@@ -2,6 +2,7 @@
   position: relative;
   width: 260px;
   height: 360px;
+  padding-top: 45px;
   border-radius: 2px;
   background-color: hsl(0, 0%, 100%);
   box-shadow: 1px 1px 15px hsla(0, 0%, 0%, .1);
@@ -9,84 +10,13 @@
   animation: show-planning-module 340ms forwards;
   font-size: 16px;
   overflow: hidden;
-  &[data-feat="JIHUA"]{
-    .task-list-wrap{
-      padding-bottom: 2.5em;
-      .task-item-wrap{
-        padding-right: 3.5em;
-      }
-      .check-box{
-        border: 2px solid hsl(281, 90%, 50%);
-      }
-    }
-    .add-task-wrap{
-      bottom: 0;
-    }
+  transition: all 170ms;
+  box-sizing: border-box;
+
+  & > * {
+    box-sizing: border-box;
   }
-  &[data-feat="HUAKAI"]{
-    .task-list-wrap{
-      padding-bottom: 0;
-      .task-item-wrap{
-        padding-right: .5em;
-      }
-      .check-box{
-        border: 2px solid hsl(231, 92%, 43%);
-        &:before, &:after{
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          height: 2px;
-          margin-top: -1px;
-          background-color: hsl(231, 92%, 43%);
-          content: '';
-        }
-        &:before{
-          width: 2px;
-          margin-left: -3px;
-          transform: rotate(45deg);
-        }
-        &:after{
-          width: 6px;
-          margin-left: -2px;
-          transform: rotate(-45deg);
-        }
-      }
-    }
-    .add-task-wrap{
-      bottom: -40px;
-    }
-  }
-  &[data-feat="CHENFENG"]{
-    .task-list-wrap{
-      padding-bottom: 0;
-      .task-item-wrap{
-        padding-right: .5em;
-      }
-      .check-box{
-        border: 2px solid hsl(24, 91%, 46%);
-        &:before, &:after{
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 7px;
-          height: 2px;
-          margin-top: -1px;
-          margin-left: -3px;
-          background-color: hsl(24, 91%, 46%);
-          content: '';
-        }
-        &:before{
-          transform: rotate(45deg);
-        }
-        &:after{
-          transform: rotate(-45deg);
-        }
-      }
-    }
-    .add-task-wrap{
-      bottom: -40px;
-    }
-  }
+
   .navbar-wrap{
     position: absolute;
     top: 0;
@@ -100,17 +30,13 @@
       height: 45px;
       line-height: 42px;
       text-align: center;
-      font-size: 1em;
       overflow: hidden;
       cursor: default;
-
-      .tag-name{
-        color: #999;
-        transition: all .230ms;
-      }
+      font-size: 14px;
 
       &.active{
-        .tag-name{color: #333;}
+        font-size: 16px;
+        font-weight: bold;
       }
     }
     &:after{
@@ -121,25 +47,29 @@
     .navbar-pointer{
       position: absolute;
       bottom: 0;
-      left: 0%;
-      width: 33.33%;
-      height: 2px;
-      background-color: #333;
-      border-radius: 10px;
-      transition: all 230ms;
+      height: 0;
+      transition: all 170ms;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        margin-left: -6px;
+        border-style: solid;
+        border-top-color: transparent;
+        border-left-color: transparent;
+        border-right-color: transparent;
+        border-width: 6px;
+      }
     }
   }
   .task-list-wrap{
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    box-sizing: border-box;
     overflow: hidden;
-    padding-top: 3em;
     transition: all 230ms;
+
     .task-list{
       height: 100%;
       overflow: auto;
@@ -193,10 +123,11 @@
     left: 0;
     font-size: 16px;
     transition: all 230ms;
+
     .add-task-input-wrap{
-      border-top: 1px solid hsl(0, 0%, 93%);
       padding-right: 2.5em;
-      background-color: hsl(0, 0%, 98%);
+      background-color: #fff;
+
       .add-task-input{
         display: block;
         width: 100%;
@@ -220,7 +151,7 @@
         right: 0;
         width: 2.5em;
         height: 2.5em;
-        border-top: 1px solid hsl(240, 3%, 94%);
+
         &:before{
           content: '';
           position: absolute;

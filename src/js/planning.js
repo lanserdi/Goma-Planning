@@ -16,20 +16,25 @@ export default class Planning {
     // 上方判断为真就给实例添加cardsProp属性
     this.cardsProp = opts.cardsProp;
 
+    this.navBarColor = opts.navBarColor || '#222';
+
     // 通过上方校验后 初始化
     this._init();
   }
   _init(){
+    this._singleNavWidth;
+    this._eleNavBarWrap;
+
     // 为容器元素添加类名
     this.eleWrap.classList.add('goma-planing-scope');
 
     // 默认第一个cardProp对象未激活状态
-    this.activeCardPropIndex = 0;
+    this._activeCardPropIndex = 0;
 
     // 渲染顶部导航
     this._renderNavBar();
-    // this.createTaskListWrap();
-    // this.createAddTaskComponent();
+    this._createTaskListWrap();
+    this._createAddTaskComponent();
   }
   // ----------NavBar-----------------
   _renderNavBar(){
@@ -37,52 +42,70 @@ export default class Planning {
     // 如果顶部导航容器不存在
     if(!this.eleWrap.querySelector('.navbar-wrap')){
       // 创建顶部导航容器
-      this.eleNavBarWrap = document.createElement('div');
-      this.eleNavBarWrap.classList.add('navbar-wrap');
+      this._eleNavBarWrap = document.createElement('div');
+      this._eleNavBarWrap.classList.add('navbar-wrap');
 
       // 追加到外部容器中
-      this.eleWrap.appendChild(this.eleNavBarWrap);
+      this.eleWrap.appendChild(this._eleNavBarWrap);
 
       // 添加点击事件监听器
-      this.eleNavBarWrap.addEventListener('click', this.onMouseClickNavbar.bind(this), false);
+      this._eleNavBarWrap.addEventListener('click', this._onMouseClickNavbar.bind(this), false);
+
+      // 存储覆盖导航容器全部内容的html片段
+      let _html = '';
+
+      // 存储cardsProp数组长度
+      let _l = this.cardsProp.length;
+
+      // 存储计算后的单个导航卡的百分比宽度
+      this._singleNavWidth = (100 / _l).toFixed(2);
+
+      for(let _i = 0; _i < _l; _i++){
+        // 存储当前遍历到的cardProp
+        let _cardProp = this.cardsProp[_i];
+        // 存储当前遍历到的cardProp的距左百分比
+        let _lp = this._singleNavWidth * _i;
+
+        // 追加导航卡
+        _html += `<div data-type="btn" data-i="${_i}" class="tag-btn ${this._activeCardPropIndex==_i?'active':''}" style="width:${this._singleNavWidth}%;">
+  <span class="tag-name" style="color:${this._activeCardPropIndex==_i?_cardProp.activeColor:_cardProp.defaultColor}">${_cardProp.title}</span>
+</div>`;
+      }
+
+      // 存储当前激活状态的导航卡的指示器距离导航容器左侧百分比距离 _active_left_position缩写
+      let _alp = this._activeCardPropIndex * this._singleNavWidth;
+      // 在当前已激活的导航卡下方追加指示器样式
+      _html += `<div class="navbar-pointer" style="left:${_alp}%;color:${this.cardsProp[this._activeCardPropIndex].activeColor};width:${this._singleNavWidth}%;"></div>`;
+
+      // 全部覆盖顶部导航容器中的内容
+      this._eleNavBarWrap.innerHTML = _html;
+      this._eleNavBarWrap.style.backgroundColor = this.navBarColor;
+      this.eleWrap.style.backgroundColor = this.cardsProp[this._activeCardPropIndex].activeColor;
+    }else{
+      // 遍历所有.tag-name
+      this._eleNavBarWrap.querySelectorAll('.tag-btn').forEach((ele, i) => {
+        if(this._activeCardPropIndex == i){
+          ele.classList.add('active');
+          ele.querySelector('.tag-name').style.color = this.cardsProp[this._activeCardPropIndex].activeColor;
+          return
+        }
+        ele.classList.remove('active');
+        ele.querySelector('.tag-name').style.color = this.cardsProp[this._activeCardPropIndex].defaultColor;
+      })
+      this.eleWrap.style.backgroundColor = this.cardsProp[this._activeCardPropIndex].activeColor;
+      this._eleNavBarWrap.querySelector('.navbar-pointer').style.left = `${this._singleNavWidth * this._activeCardPropIndex}%`;
+      this._eleNavBarWrap.querySelector('.navbar-pointer').style.color = this.cardsProp[this._activeCardPropIndex].activeColor;
     }
-
-    // 存储覆盖导航容器全部内容的html片段
-    let _html = '';
-
-    // 存储cardsProp数组长度
-    let _l = this.cardsProp.length;
-
-    // 存储计算后的单个导航卡的百分比宽度
-    let _singleNavWidth = (100 / _l).toFixed(2);
-
-    for(let _i = 0; _i < _l; _i++){
-      // 存储当前遍历到的cardProp
-      let cardProp = this.cardsProp[_i];
-      // 存储当前遍历到的cardProp的距左百分比
-      let _lp = _singleNavWidth * _i;
-
-      // 追加导航卡
-      _html += `<div data-type="btn" data-i="${_i}" class="tag-btn${this.activeCardPropIndex == _i ? ' active' : ''}" style="width:${_singleNavWidth}%;"><span class="tag-name">${cardProp.title}</span></div>`;
-    }
-
-    // 存储当前激活状态的导航卡的指示器距离导航容器左侧百分比距离 _active_left_position缩写
-    let _alp = this.activeCardPropIndex * _singleNavWidth;
-    // 在当前已激活的导航卡下方追加指示器样式
-    _html += `<div class="navbar-pointer" style="left:${_alp}%;"></div>`;
-
-    // 全部覆盖顶部导航容器中的内容
-    this.eleNavBarWrap.innerHTML = _html;
   }
-  onMouseClickNavbar(e){
+  _onMouseClickNavbar(e){
     let target = e.target;
 
-    while(target != this.eleNavBarWrap){
+    while(target != this._eleNavBarWrap){
       // 当前元素类型
       let type = target.dataset.type;
       // 如果是点击交互的按钮
       if(type == 'btn'){
-        this.activeCardPropIndex = +target.dataset.i
+        this._activeCardPropIndex = +target.dataset.i
         this._renderNavBar()
         break;
       }
@@ -116,7 +139,7 @@ export default class Planning {
     _xhr.send(null);
   }
   // ----------TASKLIST----------START
-  createTaskListWrap(){
+  _createTaskListWrap(){
     let that = this;
 
     this.eleTaskListWrap = document.createElement('div');
@@ -163,7 +186,7 @@ export default class Planning {
     return `<div data-feat="${q}"><div class="task-item-wrap" data-id="${id}" style="animation-delay: ${ 50 * i}ms"><div class="check-box" data-type="btn" data-task-id="${id}" data-feat="${q}"></div><p class="title">${title}</p><span class="date">${dateStr}</span></div></div>`;
   }
   // ----------ADDTASK----------START
-  createAddTaskComponent(){
+  _createAddTaskComponent(){
     this.eleAddTaskWrap = document.createElement('div');
     this.eleAddTaskWrap.classList.add('add-task-wrap');
     this.eleWrap.appendChild(this.eleAddTaskWrap);
