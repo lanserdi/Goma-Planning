@@ -26,6 +26,10 @@
     return Constructor;
   }
 
+  /*!!
+  * Author: lanserdi
+  * blog: http://www.shuaihuajun.com
+  */
   var Planning =
   /*#__PURE__*/
   function () {
@@ -35,13 +39,18 @@
       // 判断opts.elewrap是否为div元素
       if (Object.prototype.toString.call(opts.eleWrap) !== '[object HTMLDivElement]') throw new Error('确保eleWrap参数类型为HTMLDivElement！'); // 上方判断为真就给实例添加eleWrap属性
 
-      this._eleWrap = opts.eleWrap; //  判断opts.cardsProp是否为数组 且至少包含一个card对象
+      this._eleWrap = opts.eleWrap; // 为容器元素添加类名
+
+      this._eleWrap.classList.add('goma-planing-scope'); //  判断opts.cardsProp是否为数组 且至少包含一个card对象
+
 
       if (Object.prototype.toString.call(opts.cardsProp) !== '[object Array]' || opts.cardsProp.length < 1) throw new Error('确保cards参数为至少包含一个card对象的数组！'); // 上方判断为真就给实例添加cardsProp属性
 
-      this._cardsProp = opts.cardsProp;
-      this._navBarColor = opts.navBarColor || '#222';
-      this.onSendTask = opts.onSendTask.bind(this); // 通过上方校验后 初始化
+      this._cardsProp = opts.cardsProp; // 用户配置-顶部导航条背景色-默认色值
+
+      this._navBarColor = opts.navBarColor || '#222'; // 用户配置-点击发送任务回调方法
+
+      this._onSendTask = opts.onSendTask.bind(this); // 通过上方校验后 初始化
 
       this._init();
     }
@@ -49,20 +58,17 @@
     _createClass(Planning, [{
       key: "_init",
       value: function _init() {
-        this._singleNavWidth;
-        this._eleNavBarWrap; // 为容器元素添加类名
+        // 默认第一个cardProp对象未激活状态
+        this._activeCardPropIndex = 0; // 渲染一次顶部导航
 
-        this._eleWrap.classList.add('goma-planing-scope'); // 默认第一个cardProp对象未激活状态
+        this._renderNavBar(); // 创建任务列表
 
 
-        this._activeCardPropIndex = 0;
-        this._LOAD_TIME = 0; // 渲染顶部导航
+        this._createTaskListWrap(); // 创建添加任务组件
 
-        this._renderNavBar();
 
-        this._createTaskListWrap();
+        this._createAddTaskComponent(); // 渲染一次全部任务清单-当前激活中的导航卡内的任务
 
-        this._createAddTaskComponent();
 
         this._renderTasks();
       } // ----------NavBar-----------------
@@ -264,7 +270,8 @@
 
         if (!_value) return;
         this._eleTaskInput.value = '';
-        this.onSendTask(_value, this._appendNewTask.bind(this, {
+
+        this._onSendTask(_value, this._appendNewTask.bind(this, {
           title: _value
         }));
       } // 组件 -> 加载中...
@@ -292,7 +299,6 @@
       key: "_showLoading",
       value: function _showLoading() {
         this._eleLoading = this._createLoadingComponent();
-        this._eleLoading.style.transitionDelay = "".concat(this._LOAD_TIME, "ms");
         this._eleLoading.dataset.visibility = 'visible';
 
         this._eleWrap.appendChild(this._eleLoading);
@@ -306,9 +312,7 @@
         var timer = setTimeout(function () {
           _this3._eleLoading && _this3._eleLoading.parentNode.removeChild(_this3._eleLoading);
           _this3._eleLoading = null;
-          clearTimeout(timer);
-          timer = null;
-        }, this._LOAD_TIME * 2);
+        }, 100);
         this._eleLoading.dataset.visibility = 'hidden';
       }
     }]);
