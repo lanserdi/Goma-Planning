@@ -35,9 +35,9 @@ var planningInstance = new goma.Planning({
 
 ## 开发指南
 
-源代码使用```gulp```构建，因此需要全局安装```gulp-cli```，本地安装```gulp```。
+项目中js使用rollup构建，css使用sass构建。请全局安装rollup和sass。
 
 ```bash
-npm i -g gulp-cli
-npm i -D gulp
+npm i -g rollup
+npm i -g sass
 ```
