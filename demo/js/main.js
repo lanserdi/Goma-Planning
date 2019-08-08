@@ -1,5 +1,8 @@
-var goma = (function (exports) {
-  'use strict';
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = global || self, global.goma = factory());
+}(this, function () { 'use strict';
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -23,11 +26,6 @@ var goma = (function (exports) {
     return Constructor;
   }
 
-  function dealDateNumber(num) {
-    num = '' + num;
-    return num.charAt(1) ? num : '0' + num;
-  }
-
   var Planning =
   /*#__PURE__*/
   function () {
@@ -37,11 +35,13 @@ var goma = (function (exports) {
       // 判断opts.elewrap是否为div元素
       if (Object.prototype.toString.call(opts.eleWrap) !== '[object HTMLDivElement]') throw new Error('确保eleWrap参数类型为HTMLDivElement！'); // 上方判断为真就给实例添加eleWrap属性
 
-      this.eleWrap = opts.eleWrap; //  判断opts.cardsProp是否为数组 且至少包含一个card对象
+      this._eleWrap = opts.eleWrap; //  判断opts.cardsProp是否为数组 且至少包含一个card对象
 
       if (Object.prototype.toString.call(opts.cardsProp) !== '[object Array]' || opts.cardsProp.length < 1) throw new Error('确保cards参数为至少包含一个card对象的数组！'); // 上方判断为真就给实例添加cardsProp属性
 
-      this.cardsProp = opts.cardsProp; // 通过上方校验后 初始化
+      this._cardsProp = opts.cardsProp;
+      this._navBarColor = opts.navBarColor || '#222';
+      this.onSendTask = opts.onSendTask.bind(this); // 通过上方校验后 初始化
 
       this._init();
     }
@@ -49,193 +49,230 @@ var goma = (function (exports) {
     _createClass(Planning, [{
       key: "_init",
       value: function _init() {
-        // 为容器元素添加类名
-        this.eleWrap.classList.add('goma-planing-scope'); // 默认第一个cardProp对象未激活状态
+        this._singleNavWidth;
+        this._eleNavBarWrap; // 为容器元素添加类名
 
-        this.activeCardPropIndex = 0; // 渲染顶部导航
+        this._eleWrap.classList.add('goma-planing-scope'); // 默认第一个cardProp对象未激活状态
 
-        this._renderNavBar(); // this.createTaskListWrap();
-        // this.createAddTaskComponent();
 
+        this._activeCardPropIndex = 0;
+        this._LOAD_TIME = 0; // 渲染顶部导航
+
+        this._renderNavBar();
+
+        this._createTaskListWrap();
+
+        this._createAddTaskComponent();
+
+        this._renderTasks();
       } // ----------NavBar-----------------
 
     }, {
       key: "_renderNavBar",
       value: function _renderNavBar() {
+        var _this = this;
+
         // 如果顶部导航容器不存在
-        if (!this.eleWrap.querySelector('.navbar-wrap')) {
+        if (!this._eleWrap.querySelector('.navbar-wrap')) {
           // 创建顶部导航容器
-          this.eleNavBarWrap = document.createElement('div');
-          this.eleNavBarWrap.classList.add('navbar-wrap'); // 追加到外部容器中
+          this._eleNavBarWrap = document.createElement('div');
 
-          this.eleWrap.appendChild(this.eleNavBarWrap); // 添加点击事件监听器
-
-          this.eleNavBarWrap.addEventListener('click', this.onMouseClickNavbar.bind(this), false);
-        } // 存储覆盖导航容器全部内容的html片段
+          this._eleNavBarWrap.classList.add('navbar-wrap'); // 追加到外部容器中
 
 
-        var _html = ''; // 存储cardsProp数组长度
-
-        var _l = this.cardsProp.length; // 存储计算后的单个导航卡的百分比宽度
-
-        var _singleNavWidth = (100 / _l).toFixed(2);
-
-        for (var _i = 0; _i < _l; _i++) {
-          // 存储当前遍历到的cardProp
-          var cardProp = this.cardsProp[_i]; // 存储当前遍历到的cardProp的距左百分比
+          this._eleWrap.appendChild(this._eleNavBarWrap); // 添加点击事件监听器
 
 
-          _html += "<div data-type=\"btn\" data-i=\"".concat(_i, "\" class=\"tag-btn").concat(this.activeCardPropIndex == _i ? ' active' : '', "\" style=\"width:").concat(_singleNavWidth, "%;\"><span class=\"tag-name\">").concat(cardProp.title, "</span></div>");
-        } // 存储当前激活状态的导航卡的指示器距离导航容器左侧百分比距离 _active_left_position缩写
+          this._eleNavBarWrap.addEventListener('click', this._onMouseClickNavbar.bind(this), false); // 存储覆盖导航容器全部内容的html片段
 
 
-        var _alp = this.activeCardPropIndex * _singleNavWidth; // 在当前已激活的导航卡下方追加指示器样式
+          var _html = ''; // 存储cardsProp数组长度
+
+          var _l = this._cardsProp.length; // 存储计算后的单个导航卡的百分比宽度
+
+          this._singleNavWidth = (100 / _l).toFixed(2);
+
+          for (var _i = 0; _i < _l; _i++) {
+            // 存储当前遍历到的cardProp
+            var _cardProp = this._cardsProp[_i]; // 存储当前遍历到的cardProp的距左百分比
+
+            var _lp = this._singleNavWidth * _i; // 追加导航卡
 
 
-        _html += "<div class=\"navbar-pointer\" style=\"left:".concat(_alp, "%;\"></div>"); // 全部覆盖顶部导航容器中的内容
+            _html += "<div data-type=\"btn\" data-i=\"".concat(_i, "\" class=\"tag-btn ").concat(this._activeCardPropIndex == _i ? 'active' : '', "\" style=\"width:").concat(this._singleNavWidth, "%;\">\n  <span class=\"tag-name\" style=\"color:").concat(this._activeCardPropIndex == _i ? _cardProp.activeColor : _cardProp.defaultColor, "\">").concat(_cardProp.title, "</span>\n</div>");
+          } // 存储当前激活状态的导航卡的指示器距离导航容器左侧百分比距离 _active_left_position缩写
 
-        this.eleNavBarWrap.innerHTML = _html;
+
+          var _alp = this._activeCardPropIndex * this._singleNavWidth; // 在当前已激活的导航卡下方追加指示器样式
+
+
+          _html += "<div class=\"navbar-pointer\" style=\"left:".concat(_alp, "%;color:").concat(this._cardsProp[this._activeCardPropIndex].activeColor, ";width:").concat(this._singleNavWidth, "%;\"></div>"); // 全部覆盖顶部导航容器中的内容
+
+          this._eleNavBarWrap.innerHTML = _html;
+          this._eleNavBarWrap.style.backgroundColor = this._navBarColor;
+          this._eleWrap.style.backgroundColor = this._cardsProp[this._activeCardPropIndex].activeColor;
+        } else {
+          // 遍历所有.tag-name
+          this._eleNavBarWrap.querySelectorAll('.tag-btn').forEach(function (ele, i) {
+            if (_this._activeCardPropIndex == i) {
+              ele.classList.add('active');
+              ele.querySelector('.tag-name').style.color = _this._cardsProp[_this._activeCardPropIndex].activeColor;
+              return;
+            }
+
+            ele.classList.remove('active');
+            ele.querySelector('.tag-name').style.color = _this._cardsProp[_this._activeCardPropIndex].defaultColor;
+          });
+
+          this._eleWrap.style.backgroundColor = this._cardsProp[this._activeCardPropIndex].activeColor;
+          this._eleNavBarWrap.querySelector('.navbar-pointer').style.left = "".concat(this._singleNavWidth * this._activeCardPropIndex, "%");
+          this._eleNavBarWrap.querySelector('.navbar-pointer').style.color = this._cardsProp[this._activeCardPropIndex].activeColor;
+        }
       }
     }, {
-      key: "onMouseClickNavbar",
-      value: function onMouseClickNavbar(e) {
+      key: "_onMouseClickNavbar",
+      value: function _onMouseClickNavbar(e) {
         var target = e.target;
 
-        while (target != this.eleNavBarWrap) {
+        while (target != this._eleNavBarWrap) {
           // 当前元素类型
           var type = target.dataset.type; // 如果是点击交互的按钮
 
           if (type == 'btn') {
-            this.activeCardPropIndex = +target.dataset.i;
+            this._activeCardPropIndex = +target.dataset.i;
 
             this._renderNavBar();
+
+            if (this._activeCardPropIndex !== 0) {
+              this._eleAddTaskWrap.style.bottom = '-40px';
+            } else {
+              this._eleAddTaskWrap.style.bottom = '';
+            }
+
+            this._renderTasks();
 
             break;
           }
 
           target = target.parentNode;
         }
+      } // 组件 -> 任务列表
+
+    }, {
+      key: "_createTaskListWrap",
+      value: function _createTaskListWrap() {
+        this._eleTaskListWrap = document.createElement('div');
+
+        this._eleTaskListWrap.classList.add('task-list-wrap');
+
+        this._eleWrap.appendChild(this._eleTaskListWrap);
+
+        this._eleTaskListWrap.addEventListener('click', this._onClickTaskListWrap.bind(this), false);
+
+        this._eleTaskList = document.createElement('div');
+
+        this._eleTaskList.classList.add('task-list');
+
+        this._eleTaskListWrap.appendChild(this._eleTaskList);
       }
     }, {
-      key: "renderTasksByTag",
-      value: function renderTasksByTag(q) {
-        var _this = this;
+      key: "_renderTasks",
+      value: function _renderTasks() {
+        var _tasks = this._cardsProp[this._activeCardPropIndex].tasks;
+        var _html = '';
+        var _i = 0;
 
-        this.showLoading();
-
-        var _xhr = new XMLHttpRequest(),
-            _url = "/api/get_task?q=".concat(q);
-
-        _xhr.responseType = 'json';
-
-        _xhr.onreadystatechange = function () {
-          if (_xhr.status == 200 && _xhr.readyState == 4) {
-            var res = _xhr.response;
-
-            if (res.flag) {
-              var elesTask = '',
-                  _i = 0;
-
-              for (; _i < res.result.length; _i++) {
-                var task = res.result[_i];
-                elesTask += _this.getTaskItemTemplate(q, task.id, task.title, task.create_timestamp, _i);
-              }
-
-              _this.eleTaskList.innerHTML = elesTask;
-              elesTask = null;
-            }
-
-            res = null;
-            _xhr.onreadystatechange = null;
-            _xhr = null;
-
-            _this.destroyLoading();
-          }
-        };
-
-        _xhr.open('GET', _url, true);
-
-        _xhr.send(null);
-      } // ----------TASKLIST----------START
-
-    }, {
-      key: "createTaskListWrap",
-      value: function createTaskListWrap() {
-        var that = this;
-        this.eleTaskListWrap = document.createElement('div');
-        this.eleTaskListWrap.classList.add('task-list-wrap');
-        this.eleWrap.appendChild(this.eleTaskListWrap);
-        this.eleTaskListWrap.addEventListener('click', function (e) {
-          that.onClickTaskListWrap(this, e);
-        }, false);
-        this.eleTaskList = document.createElement('div');
-        this.eleTaskList.classList.add('task-list');
-        this.eleTaskListWrap.appendChild(this.eleTaskList);
-      }
-    }, {
-      key: "onClickTaskListWrap",
-      value: function onClickTaskListWrap(ele, e) {
-        var target = e.target,
-            type = target.dataset.type,
-            feat = target.dataset.feat,
-            id = target.dataset.taskId;
-      }
-    }, {
-      key: "appendNewTaskToTaskList",
-      value: function appendNewTaskToTaskList(id, title, timestamp) {
-        var _eleTemp = document.createElement('div');
-
-        _eleTemp.innerHTML = this.getTaskItemTemplate(id, title, timestamp);
-        this.eleTaskList.insertBefore(_eleTemp, document.querySelector('.task-list').querySelector('div'));
-      }
-    }, {
-      key: "getTaskItemTemplate",
-      value: function getTaskItemTemplate(q, id, title, timestamp, i) {
-        i = i || 0;
-        timestamp = Number(timestamp);
-        var lost = new Date(new Date().getTime() - timestamp),
-            lostDate = lost.getUTCDate() - 1,
-            dateStr = "";
-
-        if (q == 'JIHUA') {
-          if (lostDate) {
-            dateStr = "\xB7".concat(lostDate, "\u5929<");
-          } else {
-            dateStr = "".concat(dealDateNumber(lost.getUTCHours()), ":").concat(dealDateNumber(lost.getUTCMinutes()));
-          }
+        for (; _i < _tasks.length; _i++) {
+          _html += this._getTaskItemTemplate(_tasks[_i], _i);
         }
 
-        return "<div data-feat=\"".concat(q, "\"><div class=\"task-item-wrap\" data-id=\"").concat(id, "\" style=\"animation-delay: ").concat(50 * i, "ms\"><div class=\"check-box\" data-type=\"btn\" data-task-id=\"").concat(id, "\" data-feat=\"").concat(q, "\"></div><p class=\"title\">").concat(title, "</p><span class=\"date\">").concat(dateStr, "</span></div></div>");
-      } // ----------ADDTASK----------START
+        this._eleTaskList.innerHTML = _html;
+      }
+    }, {
+      key: "_appendNewTask",
+      value: function _appendNewTask(task) {
+        var _div = document.createElement('div');
+
+        _div.innerHTML = this._getTaskItemTemplate(task, 0);
+
+        this._eleTaskList.append(_div);
+
+        this._eleTaskInput.focus();
+
+        this._cardsProp[0].tasks.push(task);
+      }
+    }, {
+      key: "_getTaskItemTemplate",
+      value: function _getTaskItemTemplate(task, i) {
+        return "<div class=\"task-item-wrap\" data-id=\"".concat(task.id, "\" style=\"animation-delay: ").concat(50 * i, "ms\"><div class=\"check-box\" data-type=\"btn\" data-task-id=\"").concat(task.id, "\"></div><p class=\"title\">").concat(task.title, "</p></div>");
+      }
+    }, {
+      key: "_onClickTaskListWrap",
+      value: function _onClickTaskListWrap(e) {
+        var target = e.target;
+
+        while (target !== this._eleTaskListWrap) {
+          target = target.parentNode;
+        }
+      } // 组件 -> 创建任务
 
     }, {
-      key: "createAddTaskComponent",
-      value: function createAddTaskComponent() {
+      key: "_createAddTaskComponent",
+      value: function _createAddTaskComponent() {
         var _this2 = this;
 
-        this.eleAddTaskWrap = document.createElement('div');
-        this.eleAddTaskWrap.classList.add('add-task-wrap');
-        this.eleWrap.appendChild(this.eleAddTaskWrap);
-        this.addTaskInputWrap = document.createElement('div');
-        this.addTaskInputWrap.classList.add('add-task-input-wrap');
-        this.eleAddTaskWrap.appendChild(this.addTaskInputWrap);
-        this.eleTaskInput = document.createElement('input');
-        this.eleTaskInput.classList.add('add-task-input');
-        this.eleTaskInput.setAttribute('placeholder', '创建新的计划');
-        this.addTaskInputWrap.appendChild(this.eleTaskInput);
-        this.eleTaskInput.focus();
-        this.eleSendTask = document.createElement('div');
-        this.eleSendTask.classList.add('send-task');
-        this.addTaskInputWrap.appendChild(this.eleSendTask);
-        this.eleSendTask.addEventListener('click', function (e) {
-          _this2.onClickSendTask(e);
-        }, false);
-      } // ----------LOADING----------START
+        this._eleAddTaskWrap = document.createElement('div');
+
+        this._eleAddTaskWrap.classList.add('add-task-wrap');
+
+        this._eleWrap.appendChild(this._eleAddTaskWrap);
+
+        this._eleAddTaskInputWrap = document.createElement('div');
+
+        this._eleAddTaskInputWrap.classList.add('add-task-input-wrap');
+
+        this._eleAddTaskWrap.appendChild(this._eleAddTaskInputWrap);
+
+        this._eleTaskInput = document.createElement('input');
+
+        this._eleTaskInput.classList.add('add-task-input');
+
+        this._eleTaskInput.setAttribute('placeholder', '创建新的计划');
+
+        this._eleAddTaskInputWrap.appendChild(this._eleTaskInput);
+
+        this._eleTaskInput.focus();
+
+        this._eleTaskInput.addEventListener('keypress', function (e) {
+          if (e.keyCode == 13) _this2._onClickSendTaskBtn();
+        });
+
+        this._eleSendTask = document.createElement('div');
+
+        this._eleSendTask.classList.add('send-task');
+
+        this._eleSendTask.style.color = this._cardsProp[0].activeColor;
+
+        this._eleAddTaskInputWrap.appendChild(this._eleSendTask);
+
+        this._eleSendTask.addEventListener('click', this._onClickSendTaskBtn.bind(this), false);
+      }
+    }, {
+      key: "_onClickSendTaskBtn",
+      value: function _onClickSendTaskBtn() {
+        var _value = this._eleTaskInput.value.trim();
+
+        if (!_value) return;
+        this._eleTaskInput.value = '';
+        this.onSendTask(_value, this._appendNewTask.bind(this, {
+          title: _value
+        }));
+      } // 组件 -> 加载中...
 
     }, {
-      key: "createLoadingComponent",
-      value: function createLoadingComponent() {
-        var eleWrap = document.createElement('div'),
+      key: "_createLoadingComponent",
+      value: function _createLoadingComponent() {
+        var _div = document.createElement('div'),
             elesLoading = '',
             d = 14,
             count = 4,
@@ -246,40 +283,43 @@ var goma = (function (exports) {
           elesLoading += "<span class=\"loading-dot\" style=\"animation: loading-dot 870ms ".concat(i * delay, "ms cubic-bezier(.21,.02,.78,.98) infinite; background-color: ").concat(colorCube[i], "; margin-left: ").concat((i - Math.ceil(count / 2)) * d, "px;\"></span>");
         }
 
-        eleWrap.classList.add('loading-wrap');
-        eleWrap.innerHTML = elesLoading;
-        return eleWrap;
+        _div.classList.add('loading-wrap');
+
+        _div.innerHTML = elesLoading;
+        return _div;
       }
     }, {
-      key: "showLoading",
-      value: function showLoading() {
-        var _duration = this.LOAD_TIME;
-        this.eleLoading = this.createLoadingComponent();
-        this.eleLoading.style.transitionDelay = "".concat(_duration, "ms");
-        this.eleLoading.dataset.visibility = 'visible';
-        this.eleWrap.appendChild(this.eleLoading);
+      key: "_showLoading",
+      value: function _showLoading() {
+        this._eleLoading = this._createLoadingComponent();
+        this._eleLoading.style.transitionDelay = "".concat(this._LOAD_TIME, "ms");
+        this._eleLoading.dataset.visibility = 'visible';
+
+        this._eleWrap.appendChild(this._eleLoading);
       }
     }, {
-      key: "destroyLoading",
-      value: function destroyLoading() {
+      key: "_destroyLoading",
+      value: function _destroyLoading() {
         var _this3 = this;
 
-        if (!this.eleLoading) return;
+        if (!this._eleLoading) return;
         var timer = setTimeout(function () {
-          _this3.eleLoading && _this3.eleLoading.parentNode.removeChild(_this3.eleLoading);
-          _this3.eleLoading = null;
+          _this3._eleLoading && _this3._eleLoading.parentNode.removeChild(_this3._eleLoading);
+          _this3._eleLoading = null;
           clearTimeout(timer);
           timer = null;
-        }, this.LOAD_TIME * 2);
-        this.eleLoading.dataset.visibility = 'hidden';
+        }, this._LOAD_TIME * 2);
+        this._eleLoading.dataset.visibility = 'hidden';
       }
     }]);
 
     return Planning;
   }();
 
-  exports.Planning = Planning;
+  var main = {
+    Planning: Planning
+  };
 
-  return exports;
+  return main;
 
-}({}));
+}));
