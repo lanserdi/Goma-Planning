@@ -16,7 +16,7 @@
   "homepage": "https://github.com/lanserdi/Planning-Airglass#readme",
   "dependencies": {},
   "scripts": {
-    "css": "sass --watch src/css/main.scss:demo/css/main.css --style compressed --sourcemap=inline",
+    "css": "sass --watch src/css/main.scss:demo/css/main.css --style=compressed --source-map",
     "js": "rollup -c -w"
   },
   "devDependencies": {
