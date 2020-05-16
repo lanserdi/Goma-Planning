@@ -1,6 +1,11 @@
-## 使用指南
+## 在线体验入口
 
-![](./media/demo.gif)
+[待办事项清单小工具](https://www.shuaihuajun.com/project/goma-planning/index.html)
+![待办事项清单小工具](./demo.gif)
+
+
+
+## 使用指南
 
 ```html
 <div id="elePlanning"></div>
@@ -31,13 +36,4 @@ var planningInstance = new goma.Planning({
     }
   ]
 });
-```
-
-## 开发指南
-
-项目中js使用rollup构建，css使用sass构建。请全局安装rollup和sass。
-
-```bash
-npm i -g rollup
-npm i -g sass
 ```
